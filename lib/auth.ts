@@ -15,29 +15,35 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // Oddiy parol tekshirish (hashing yo'q)
-        const admin = await prisma.admin.findUnique({
-          where: { username: credentials.username },
-        })
+        try {
+          const admin = await prisma.admin.findUnique({
+            where: { username: credentials.username },
+          })
 
-        if (!admin || admin.password !== credentials.password) {
+          if (!admin || admin.password !== credentials.password) {
+            return null
+          }
+
+          return {
+            id: admin.id,
+            name: admin.name,
+            username: admin.username,
+          }
+        } catch (error) {
+          console.error("[v0] Auth error:", error)
           return null
-        }
-
-        return {
-          id: admin.id,
-          name: admin.name,
-          username: admin.username,
         }
       },
     }),
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: "/login",
   },
+  trustHost: true,
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
