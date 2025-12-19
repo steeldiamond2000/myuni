@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 import { deleteEmployee } from "@/app/actions/employees"
+import { Loader2 } from "lucide-react"
 
 type Props = {
   children: ReactNode
@@ -30,12 +31,16 @@ export default function DeleteEmployeeDialog({ children, employeeId, employeeNam
   const handleDelete = async () => {
     setIsLoading(true)
     try {
-      await deleteEmployee(employeeId)
-      toast.success("Hodim o'chirildi")
-      setOpen(false)
-      router.refresh()
+      const result = await deleteEmployee(employeeId)
+      if (result.success) {
+        toast.success("Hodim o'chirildi")
+        setOpen(false)
+        router.refresh()
+      } else {
+        toast.error(result.error || "Xatolik yuz berdi")
+      }
     } catch (error) {
-      toast.error("Xatolik yuz berdi")
+      toast.error("Kutilmagan xatolik yuz berdi")
     } finally {
       setIsLoading(false)
     }
@@ -65,7 +70,14 @@ export default function DeleteEmployeeDialog({ children, employeeId, employeeNam
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? "O'chirilmoqda..." : "O'chirish"}
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                O'chirilmoqda...
+              </>
+            ) : (
+              "O'chirish"
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

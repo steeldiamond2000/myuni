@@ -22,7 +22,7 @@ type Asset = {
   purchaseDate: Date
   quantity: number
   status: string
-  qrCodeValue: string
+  qrCodeValue: string | null // QR kod null bo'lishi mumkin
   currentAssignment: {
     employee: {
       id: string
@@ -165,11 +165,17 @@ export default function AssetTable({ assets }: { assets: Asset[] }) {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <QRCodeDialog assetId={asset.id} assetName={asset.name} qrValue={asset.qrCodeValue}>
-                        <Button variant="ghost" size="icon" title="QR kodni ko'rish">
-                          <QrCode className="h-4 w-4" />
+                      {asset.qrCodeValue && asset.currentAssignment ? (
+                        <QRCodeDialog assetId={asset.id} assetName={asset.name} qrValue={asset.qrCodeValue}>
+                          <Button variant="ghost" size="icon" title="QR kodni ko'rish">
+                            <QrCode className="h-4 w-4" />
+                          </Button>
+                        </QRCodeDialog>
+                      ) : (
+                        <Button variant="ghost" size="icon" disabled title="Avval javobgar belgilang">
+                          <QrCode className="h-4 w-4 text-muted-foreground" />
                         </Button>
-                      </QRCodeDialog>
+                      )}
                       <AssignEmployeeDialog asset={asset}>
                         <Button variant="ghost" size="icon" title="Javobgar belgilash">
                           <UserPlus className="h-4 w-4" />

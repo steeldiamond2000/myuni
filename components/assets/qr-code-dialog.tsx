@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Download, Printer } from "lucide-react"
+import { Download, Printer, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
 
 type Props = {
@@ -23,6 +23,7 @@ type Props = {
 export default function QRCodeDialog({ children, assetId, assetName, qrValue }: Props) {
   const [open, setOpen] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string>("")
+  const [qrUrl, setQrUrl] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export default function QRCodeDialog({ children, assetId, assetName, qrValue }: 
       const response = await fetch(`/api/qr-code/${qrValue}`)
       const data = await response.json()
       setQrDataUrl(data.dataUrl)
+      setQrUrl(data.url)
     } catch (error) {
       toast.error("QR kodni yuklab bo'lmadi")
     } finally {
@@ -88,7 +90,7 @@ export default function QRCodeDialog({ children, assetId, assetName, qrValue }: 
           <body>
             <h2>${assetName}</h2>
             <img src="${qrDataUrl}" alt="QR Code" />
-            <p>Inventar: ${assetName}</p>
+            <p>Skanerlang va buyum haqida ma'lumot oling</p>
           </body>
         </html>
       `)
@@ -96,6 +98,12 @@ export default function QRCodeDialog({ children, assetId, assetName, qrValue }: 
       setTimeout(() => {
         printWindow.print()
       }, 250)
+    }
+  }
+
+  const handlePreview = () => {
+    if (qrUrl) {
+      window.open(qrUrl, "_blank")
     }
   }
 
@@ -116,26 +124,32 @@ export default function QRCodeDialog({ children, assetId, assetName, qrValue }: 
             <img src={qrDataUrl || "/placeholder.svg"} alt="QR Code" className="w-64 h-64" />
           ) : null}
           <p className="text-sm text-muted-foreground text-center">
-            Bu QR kodni skaner qiling yoki telefon kamerasi bilan o'qing
+            Bu QR kodni xprinterda chop etib, buyumga yopshtiring
           </p>
-          <div className="flex gap-2 w-full">
-            <Button
-              onClick={handleDownload}
-              variant="outline"
-              className="flex-1 gap-2 bg-transparent"
-              disabled={!qrDataUrl}
-            >
-              <Download className="h-4 w-4" />
-              Yuklab olish
-            </Button>
-            <Button
-              onClick={handlePrint}
-              variant="outline"
-              className="flex-1 gap-2 bg-transparent"
-              disabled={!qrDataUrl}
-            >
-              <Printer className="h-4 w-4" />
-              Chop etish
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex gap-2 w-full">
+              <Button
+                onClick={handleDownload}
+                variant="outline"
+                className="flex-1 gap-2 bg-transparent"
+                disabled={!qrDataUrl}
+              >
+                <Download className="h-4 w-4" />
+                Yuklab olish
+              </Button>
+              <Button
+                onClick={handlePrint}
+                variant="outline"
+                className="flex-1 gap-2 bg-transparent"
+                disabled={!qrDataUrl}
+              >
+                <Printer className="h-4 w-4" />
+                Chop etish
+              </Button>
+            </div>
+            <Button onClick={handlePreview} variant="secondary" className="w-full gap-2" disabled={!qrUrl}>
+              <ExternalLink className="h-4 w-4" />
+              Public sahifani ko'rish
             </Button>
           </div>
         </div>

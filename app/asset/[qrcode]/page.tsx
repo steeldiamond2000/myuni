@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   Clock,
+  Package,
 } from "lucide-react"
 import { format } from "date-fns"
 
@@ -30,20 +31,29 @@ const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
   material: { label: "Moddiy buyum", color: "bg-sky-100 text-sky-700 border-sky-200" },
 }
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function PublicAssetPage({ params }: { params: Promise<{ qrcode: string }> }) {
   const { qrcode } = await params
 
-  const asset = await prisma.asset.findUnique({
-    where: { qrCodeValue: qrcode },
-    include: {
-      assignments: {
-        where: { isActive: true },
-        include: {
-          employee: true,
+  let asset
+  try {
+    asset = await prisma.asset.findUnique({
+      where: { qrCodeValue: qrcode },
+      include: {
+        assignments: {
+          where: { isActive: true },
+          include: {
+            employee: true,
+          },
         },
       },
-    },
-  })
+    })
+  } catch (error) {
+    console.error("[v0] Public asset fetch error:", error)
+    notFound()
+  }
 
   if (!asset) {
     notFound()
@@ -116,11 +126,27 @@ export default async function PublicAssetPage({ params }: { params: Promise<{ qr
                 </div>
                 <p className="font-semibold text-white">{format(new Date(asset.purchaseDate), "dd.MM.yyyy")}</p>
               </div>
+
+              <div className="bg-white/5 rounded-xl p-4 space-y-2">
+                <div className="flex items-center gap-2 text-slate-400 text-sm">
+                  <Package className="h-4 w-4" />
+                  Miqdori
+                </div>
+                <p className="font-semibold text-white">{asset.quantity} dona</p>
+              </div>
+
+              <div className="bg-white/5 rounded-xl p-4 space-y-2">
+                <div className="flex items-center gap-2 text-slate-400 text-sm">
+                  <Clock className="h-4 w-4" />
+                  Tizimga kiritilgan
+                </div>
+                <p className="font-semibold text-white">{format(new Date(asset.createdAt), "dd.MM.yyyy")}</p>
+              </div>
             </div>
 
             <Separator className="bg-white/20" />
 
-            {/* Responsible Person */}
+            {/* Responsible Person - always shown since QR code only exists when assigned */}
             {currentAssignment ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-emerald-400">
@@ -191,7 +217,7 @@ export default async function PublicAssetPage({ params }: { params: Promise<{ qr
 
         {/* Footer Info */}
         <div className="mt-6 text-center space-y-2">
-          <p className="text-sm text-slate-500">QR kod orqali ochildi • Faqat ko'rish uchun</p>
+          <p className="text-sm text-slate-500">QR kod orqali ochildi</p>
           <p className="text-xs text-slate-600">© {new Date().getFullYear()} Universitet MTB Tizimi</p>
         </div>
       </main>
@@ -201,18 +227,25 @@ export default async function PublicAssetPage({ params }: { params: Promise<{ qr
 
 export async function generateMetadata({ params }: { params: Promise<{ qrcode: string }> }) {
   const { qrcode } = await params
-  const asset = await prisma.asset.findUnique({
-    where: { qrCodeValue: qrcode },
-  })
 
-  if (!asset) {
+  try {
+    const asset = await prisma.asset.findUnique({
+      where: { qrCodeValue: qrcode },
+    })
+
+    if (!asset) {
+      return {
+        title: "Buyum topilmadi",
+      }
+    }
+
+    return {
+      title: `${asset.name} - Universitet MTB`,
+      description: `Inventar: ${asset.inventoryNumber} | Status: ${STATUS_CONFIG[asset.status]?.label || asset.status}`,
+    }
+  } catch {
     return {
       title: "Buyum topilmadi",
     }
-  }
-
-  return {
-    title: `${asset.name} - Universitet MTB`,
-    description: `Inventar: ${asset.inventoryNumber} | Status: ${STATUS_CONFIG[asset.status]?.label || asset.status}`,
   }
 }

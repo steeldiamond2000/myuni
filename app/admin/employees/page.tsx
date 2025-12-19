@@ -5,24 +5,37 @@ import { Plus } from "lucide-react"
 import EmployeeTable from "@/components/employees/employee-table"
 import EmployeeDialog from "@/components/employees/employee-dialog"
 import ExportEmployeesButton from "@/components/employees/export-employees-button"
+import { Suspense } from "react"
 
-export default async function EmployeesPage() {
-  const employees = await prisma.employee.findMany({
-    include: {
-      assignments: {
-        where: { isActive: true },
-        include: {
-          asset: true,
+export const dynamic = "force-dynamic"
+export const revalidate = 30
+
+async function getEmployees() {
+  try {
+    const employees = await prisma.employee.findMany({
+      include: {
+        assignments: {
+          where: { isActive: true },
+          include: {
+            asset: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  })
+      orderBy: { createdAt: "desc" },
+    })
 
-  const employeesWithCount = employees.map((emp) => ({
-    ...emp,
-    assignedAssetsCount: emp.assignments.length,
-  }))
+    return employees.map((emp) => ({
+      ...emp,
+      assignedAssetsCount: emp.assignments.length,
+    }))
+  } catch (error) {
+    console.error("[v0] getEmployees error:", error)
+    return []
+  }
+}
+
+export default async function EmployeesPage() {
+  const employeesWithCount = await getEmployees()
 
   return (
     <div className="space-y-6">
@@ -44,10 +57,12 @@ export default async function EmployeesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Barcha hodimlar ({employees.length})</CardTitle>
+          <CardTitle>Barcha hodimlar ({employeesWithCount.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <EmployeeTable employees={employeesWithCount} />
+          <Suspense fallback={<div className="py-8 text-center text-muted-foreground">Yuklanmoqda...</div>}>
+            <EmployeeTable employees={employeesWithCount} />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

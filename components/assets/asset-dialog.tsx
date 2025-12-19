@@ -54,20 +54,35 @@ export default function AssetDialog({ children, asset }: Props) {
 
     try {
       if (asset?.id) {
-        await updateAsset(asset.id, formData)
-        toast.success("Buyum ma'lumotlari yangilandi")
+        const result = await updateAsset(asset.id, formData)
+        if (result.success) {
+          toast.success("Buyum ma'lumotlari yangilandi")
+          setOpen(false)
+          router.refresh()
+        } else {
+          toast.error(result.error || "Xatolik yuz berdi")
+        }
       } else {
-        await createAsset(formData)
-        toast.success("Yangi buyum qo'shildi va QR kod yaratildi")
+        const result = await createAsset(formData)
+        if (result.success) {
+          toast.success("Yangi buyum qo'shildi va QR kod yaratildi")
+          setOpen(false)
+          setFormData({
+            name: "",
+            model: "",
+            inventoryNumber: "",
+            category: "material",
+            purchaseDate: new Date(),
+            quantity: 1,
+            status: "new",
+          })
+          router.refresh()
+        } else {
+          toast.error(result.error || "Xatolik yuz berdi")
+        }
       }
-      setOpen(false)
-      router.refresh()
     } catch (error: any) {
-      if (error.message.includes("unique")) {
-        toast.error("Bu inventar raqami allaqachon mavjud")
-      } else {
-        toast.error("Xatolik yuz berdi")
-      }
+      toast.error("Kutilmagan xatolik yuz berdi")
     } finally {
       setIsLoading(false)
     }
@@ -115,8 +130,9 @@ export default function AssetDialog({ children, asset }: Props) {
               <Select
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
+                disabled={isLoading}
               >
-                <SelectTrigger id="category" disabled={isLoading}>
+                <SelectTrigger id="category">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -127,8 +143,12 @@ export default function AssetDialog({ children, asset }: Props) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status *</Label>
-              <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                <SelectTrigger id="status" disabled={isLoading}>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
+                disabled={isLoading}
+              >
+                <SelectTrigger id="status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

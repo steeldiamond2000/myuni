@@ -5,24 +5,37 @@ import { Plus } from "lucide-react"
 import AssetTable from "@/components/assets/asset-table"
 import AssetDialog from "@/components/assets/asset-dialog"
 import ExportAssetsButton from "@/components/assets/export-assets-button"
+import { Suspense } from "react"
 
-export default async function AssetsPage() {
-  const assets = await prisma.asset.findMany({
-    include: {
-      assignments: {
-        where: { isActive: true },
-        include: {
-          employee: true,
+export const dynamic = "force-dynamic"
+export const revalidate = 30
+
+async function getAssets() {
+  try {
+    const assets = await prisma.asset.findMany({
+      include: {
+        assignments: {
+          where: { isActive: true },
+          include: {
+            employee: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  })
+      orderBy: { createdAt: "desc" },
+    })
 
-  const assetsWithResponsible = assets.map((asset) => ({
-    ...asset,
-    currentAssignment: asset.assignments[0] || null,
-  }))
+    return assets.map((asset) => ({
+      ...asset,
+      currentAssignment: asset.assignments[0] || null,
+    }))
+  } catch (error) {
+    console.error("[v0] getAssets error:", error)
+    return []
+  }
+}
+
+export default async function AssetsPage() {
+  const assetsWithResponsible = await getAssets()
 
   return (
     <div className="space-y-6">
@@ -44,10 +57,12 @@ export default async function AssetsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Barcha buyumlar ({assets.length})</CardTitle>
+          <CardTitle>Barcha buyumlar ({assetsWithResponsible.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <AssetTable assets={assetsWithResponsible} />
+          <Suspense fallback={<div className="py-8 text-center text-muted-foreground">Yuklanmoqda...</div>}>
+            <AssetTable assets={assetsWithResponsible} />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

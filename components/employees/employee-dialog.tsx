@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { createEmployee, updateEmployee } from "@/app/actions/employees"
+import { Loader2 } from "lucide-react"
 
 type EmployeeFormData = {
   id?: string
@@ -49,16 +50,33 @@ export default function EmployeeDialog({ children, employee }: Props) {
 
     try {
       if (employee?.id) {
-        await updateEmployee(employee.id, formData)
-        toast.success("Hodim ma'lumotlari yangilandi")
+        const result = await updateEmployee(employee.id, formData)
+        if (result.success) {
+          toast.success("Hodim ma'lumotlari yangilandi")
+          setOpen(false)
+          router.refresh()
+        } else {
+          toast.error(result.error || "Xatolik yuz berdi")
+        }
       } else {
-        await createEmployee(formData)
-        toast.success("Yangi hodim qo'shildi")
+        const result = await createEmployee(formData)
+        if (result.success) {
+          toast.success("Yangi hodim qo'shildi")
+          setOpen(false)
+          setFormData({
+            firstName: "",
+            lastName: "",
+            position: "",
+            phone: "",
+            hireDate: new Date(),
+          })
+          router.refresh()
+        } else {
+          toast.error(result.error || "Xatolik yuz berdi")
+        }
       }
-      setOpen(false)
-      router.refresh()
     } catch (error) {
-      toast.error("Xatolik yuz berdi")
+      toast.error("Kutilmagan xatolik yuz berdi")
     } finally {
       setIsLoading(false)
     }
@@ -76,7 +94,7 @@ export default function EmployeeDialog({ children, employee }: Props) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="firstName">Ism</Label>
+            <Label htmlFor="firstName">Ism *</Label>
             <Input
               id="firstName"
               value={formData.firstName}
@@ -86,7 +104,7 @@ export default function EmployeeDialog({ children, employee }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName">Familiya</Label>
+            <Label htmlFor="lastName">Familiya *</Label>
             <Input
               id="lastName"
               value={formData.lastName}
@@ -96,7 +114,7 @@ export default function EmployeeDialog({ children, employee }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="position">Lavozim</Label>
+            <Label htmlFor="position">Lavozim *</Label>
             <Input
               id="position"
               value={formData.position}
@@ -117,7 +135,7 @@ export default function EmployeeDialog({ children, employee }: Props) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="hireDate">Ishga kirgan sana</Label>
+            <Label htmlFor="hireDate">Ishga kirgan sana *</Label>
             <Input
               id="hireDate"
               type="date"
@@ -132,7 +150,14 @@ export default function EmployeeDialog({ children, employee }: Props) {
               Bekor qilish
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saqlanmoqda..." : "Saqlash"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saqlanmoqda...
+                </>
+              ) : (
+                "Saqlash"
+              )}
             </Button>
           </div>
         </form>

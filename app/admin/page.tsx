@@ -2,19 +2,33 @@ import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, Users, ClipboardList, TrendingUp } from "lucide-react"
 
-export default async function AdminDashboard() {
-  const [totalAssets, totalEmployees, activeAssignments, recentAssets] = await Promise.all([
-    prisma.asset.count(),
-    prisma.employee.count(),
-    prisma.assetAssignment.count({ where: { isActive: true } }),
-    prisma.asset.count({
-      where: {
-        createdAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+export const dynamic = "force-dynamic"
+export const revalidate = 60
+
+async function getStats() {
+  try {
+    const [totalAssets, totalEmployees, activeAssignments, recentAssets] = await Promise.all([
+      prisma.asset.count(),
+      prisma.employee.count(),
+      prisma.assetAssignment.count({ where: { isActive: true } }),
+      prisma.asset.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          },
         },
-      },
-    }),
-  ])
+      }),
+    ])
+
+    return { totalAssets, totalEmployees, activeAssignments, recentAssets }
+  } catch (error) {
+    console.error("[v0] getStats error:", error)
+    return { totalAssets: 0, totalEmployees: 0, activeAssignments: 0, recentAssets: 0 }
+  }
+}
+
+export default async function AdminDashboard() {
+  const { totalAssets, totalEmployees, activeAssignments, recentAssets } = await getStats()
 
   const stats = [
     {

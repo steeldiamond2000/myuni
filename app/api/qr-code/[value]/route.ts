@@ -11,9 +11,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ valu
 
     // Agar host mavjud bo'lsa, undan foydalanish
     const baseUrl = host ? `${protocol}://${host}` : getBaseUrl()
+    const url = `${baseUrl}/asset/${value}`
 
     const dataUrl = await generateQRCodeDataURL(value, baseUrl)
-    return NextResponse.json({ dataUrl })
+    return NextResponse.json({ dataUrl, url })
   } catch (error) {
     return NextResponse.json({ error: "Failed to generate QR code" }, { status: 500 })
   }
