@@ -11,19 +11,19 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Universitet Moddiy-Texnik Baza Tizimi",
   description: "Universitet inventar boshqarish tizimi",
-  generator: "v0.app",
+  generator: "Mansurbek",
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
+        url: "/apple-icon.png",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/icon-dark-32x32.png",
+        url: "/apple-icon.png",
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/icon.svg",
+        url: "/apple-icon.png",
         type: "image/svg+xml",
       },
     ],
