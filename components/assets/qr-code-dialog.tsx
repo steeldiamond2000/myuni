@@ -58,35 +58,19 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
   }
 
   const handlePrint = () => {
-    const printWindow = window.open("", "_blank", "width=227,height=227")
+    const shortName = assetName.length > 40 ? assetName.substring(0, 37) + "..." : assetName
+
+    const printWindow = window.open("", "_blank")
     if (printWindow) {
       printWindow.document.write(`
         <!DOCTYPE html>
         <html>
           <head>
-            <title>Label</title>
+            <title>Label ${inventoryNumber}</title>
             <style>
               @page {
                 size: 60mm 60mm;
-                margin: 0 !important;
-                padding: 0 !important;
-              }
-
-              @media print {
-                html, body {
-                  width: 60mm !important;
-                  height: 60mm !important;
-                  margin: 0 !important;
-                  padding: 0 !important;
-                  overflow: hidden !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                }
-
-                /* Browser header/footer ni yashirish */
-                @page {
-                  margin: 0 !important;
-                }
+                margin: 0;
               }
 
               * {
@@ -101,60 +85,78 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
                 margin: 0;
                 padding: 0;
                 background: white;
+                overflow: hidden;
               }
 
-              .label {
+              .label-container {
                 width: 60mm;
                 height: 60mm;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 3mm;
-                font-family: Arial, Helvetica, sans-serif;
+                position: relative;
+                background: white;
+              }
+
+              .content {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
               }
 
               .qr-code {
-                width: 36mm;
-                height: 36mm;
+                width: 32mm;
+                height: 32mm;
+                margin: 0 auto;
               }
 
               .qr-code img {
                 width: 100%;
                 height: 100%;
+                display: block;
               }
 
-              .inventory {
-                font-size: 12pt;
+              .inventory-number {
+                font-family: Arial, sans-serif;
+                font-size: 11pt;
                 font-weight: bold;
                 margin-top: 2mm;
-                text-align: center;
+                color: #000;
               }
 
-              .name {
+              .asset-name {
+                font-family: Arial, sans-serif;
                 font-size: 7pt;
-                text-align: center;
                 margin-top: 1mm;
-                max-width: 54mm;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+                color: #333;
+                max-width: 50mm;
+                word-wrap: break-word;
+              }
+
+              @media print {
+                html, body {
+                  width: 60mm;
+                  height: 60mm;
+                  -webkit-print-color-adjust: exact;
+                  print-color-adjust: exact;
+                }
               }
             </style>
           </head>
           <body>
-            <div class="label">
-              <div class="qr-code">
-                <img src="${qrDataUrl}" alt="QR" />
+            <div class="label-container">
+              <div class="content">
+                <div class="qr-code">
+                  <img src="${qrDataUrl}" alt="QR" />
+                </div>
+                <div class="inventory-number">${inventoryNumber}</div>
+                <div class="asset-name">${shortName}</div>
               </div>
-              <div class="inventory">${inventoryNumber}</div>
-              <div class="name">${assetName}</div>
             </div>
             <script>
               window.onload = function() {
                 setTimeout(function() {
                   window.print();
-                }, 100);
+                }, 200);
               }
             </script>
           </body>
@@ -187,18 +189,18 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
             </div>
           ) : qrDataUrl ? (
             <div
-              className="border-2 border-dashed border-slate-300 rounded-lg bg-white"
+              className="border-2 border-dashed border-slate-300 rounded-lg bg-white relative"
               style={{ width: "170px", height: "170px" }}
             >
-              <div className="w-full h-full flex flex-col items-center justify-center p-2">
-                <img src={qrDataUrl || "/placeholder.svg"} alt="QR Code" className="w-24 h-24" />
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                <img src={qrDataUrl || "/placeholder.svg"} alt="QR Code" className="w-20 h-20 mx-auto" />
                 <div className="font-bold text-xs mt-1">{inventoryNumber}</div>
-                <div className="text-[10px] text-muted-foreground text-center truncate max-w-full">{assetName}</div>
+                <div className="text-[9px] text-muted-foreground text-center max-w-[150px] truncate">{assetName}</div>
               </div>
             </div>
           ) : null}
           <p className="text-xs text-muted-foreground text-center">
-            Chop etishda browser sozlamalarida "Headers and footers" ni o'chiring
+            Print dialogda: More settings → Headers and footers → O'chirish
           </p>
           <div className="flex flex-col gap-2 w-full">
             <div className="flex gap-2 w-full">
