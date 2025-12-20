@@ -166,7 +166,12 @@ export default function AssetTable({ assets }: { assets: Asset[] }) {
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
                       {asset.qrCodeValue && asset.currentAssignment ? (
-                        <QRCodeDialog assetId={asset.id} assetName={asset.name} qrValue={asset.qrCodeValue}>
+                        <QRCodeDialog
+                          assetId={asset.id}
+                          assetName={asset.name}
+                          inventoryNumber={asset.inventoryNumber}
+                          qrValue={asset.qrCodeValue}
+                        >
                           <Button variant="ghost" size="icon" title="QR kodni ko'rish">
                             <QrCode className="h-4 w-4" />
                           </Button>
