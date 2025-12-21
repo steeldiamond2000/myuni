@@ -58,7 +58,7 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
   }
 
   const handlePrint = () => {
-    const shortName = assetName.length > 40 ? assetName.substring(0, 37) + "..." : assetName
+    const shortName = assetName.length > 70 ? assetName.substring(0, 67) + "..." : assetName
 
     const printWindow = window.open("", "_blank")
     if (printWindow) {
@@ -125,7 +125,8 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
 
               .asset-name {
                 font-family: Arial, sans-serif;
-                font-size: 7pt;
+                font-size: 9pt;
+                font-weight: bold;
                 margin-top: 1mm;
                 color: #333;
                 max-width: 50mm;
