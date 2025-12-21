@@ -101,11 +101,12 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
                 left: 50%;
                 transform: translate(-50%, -50%);
                 text-align: center;
+                width: 56mm;
               }
 
               .qr-code {
-                width: 32mm;
-                height: 32mm;
+                width: 30mm;
+                height: 30mm;
                 margin: 0 auto;
               }
 
@@ -126,13 +127,14 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
 
               .asset-name {
                 font-family: Arial, sans-serif;
-                font-size: 10pt;
-                font-weight: 800;
+                font-size: 8pt;
+                font-weight: 700;
                 margin-top: 1mm;
                 color: #000;
-                max-width: 50mm;
+                width: 56mm;
                 word-wrap: break-word;
-                letter-spacing: 0.3px;
+                line-height: 1.3;
+                letter-spacing: 0.2px;
               }
 
               @media print {
@@ -178,7 +180,7 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>QR Kod - Label (6x6 cm)</DialogTitle>
           <DialogDescription>
@@ -193,12 +195,14 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
           ) : qrDataUrl ? (
             <div
               className="border-2 border-dashed border-slate-300 rounded-lg bg-white relative"
-              style={{ width: "170px", height: "170px" }}
+              style={{ width: "240px", height: "200px" }}
             >
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                <img src={qrDataUrl || "/placeholder.svg"} alt="QR Code" className="w-20 h-20 mx-auto" />
-                <div className="font-bold text-xs mt-1">{inventoryNumber}</div>
-                <div className="text-[9px] text-muted-foreground text-center max-w-[150px] truncate">{assetName}</div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center w-full px-3">
+                <img src={qrDataUrl || "/placeholder.svg"} alt="QR Code" className="w-24 h-24 mx-auto" />
+                <div className="font-bold text-sm mt-2">{inventoryNumber}</div>
+                <p className="text-[11px] font-bold text-black text-center max-w-[220px] mx-auto leading-tight mt-1">
+                  {assetName.length > 70 ? assetName.substring(0, 67) + "..." : assetName}
+                </p>
               </div>
             </div>
           ) : null}
