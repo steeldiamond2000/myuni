@@ -118,19 +118,21 @@ export default function QRCodeDialog({ children, assetId, assetName, inventoryNu
               .inventory-number {
                 font-family: Arial, sans-serif;
                 font-size: 11pt;
-                font-weight: bold;
+                font-weight: 800;
                 margin-top: 2mm;
                 color: #000;
+                letter-spacing: 0.5px;
               }
 
               .asset-name {
                 font-family: Arial, sans-serif;
-                font-size: 9pt;
-                font-weight: bold;
+                font-size: 10pt;
+                font-weight: 800;
                 margin-top: 1mm;
-                color: #333;
+                color: #000;
                 max-width: 50mm;
                 word-wrap: break-word;
+                letter-spacing: 0.3px;
               }
 
               @media print {
