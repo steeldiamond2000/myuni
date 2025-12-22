@@ -6,13 +6,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
+import Image from "next/image"
 import {
   Calendar,
   User,
   Briefcase,
   Phone,
   FileText,
-  Building2,
   Hash,
   Tag,
   CheckCircle2,
@@ -130,8 +130,8 @@ export default function PublicAssetPage() {
       <header className="bg-white/5 backdrop-blur-sm border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-center gap-3">
-            <div className="p-2 bg-emerald-500/20 rounded-lg">
-              <Building2 className="h-6 w-6 text-emerald-400" />
+            <div className="p-1 bg-white/10 rounded-lg">
+              <Image src="/logo-light.png" alt="Universitet logosi" width={40} height={40} className="object-contain" />
             </div>
             <div className="text-center">
               <h1 className="text-lg font-bold text-white">Universitet MTB Tizimi</h1>
@@ -280,7 +280,7 @@ export default function PublicAssetPage() {
         {/* Footer Info */}
         <div className="mt-6 text-center space-y-2">
           <p className="text-sm text-slate-500">QR kod orqali ochildi</p>
-          <p className="text-xs text-slate-600">© {new Date().getFullYear()} Universitet MTB Tizimi</p>
+          <p className="text-xs text-slate-600">© {new Date().getFullYear()} Supported by the IT department.   mansurbek.info</p>
         </div>
       </main>
     </div>
