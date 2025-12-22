@@ -39,15 +39,15 @@ export default async function EmployeesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Hodimlar</h1>
           <p className="text-muted-foreground">Xodimlarni boshqarish va ko'rish</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <ExportEmployeesButton employees={employeesWithCount} />
           <EmployeeDialog>
-            <Button className="gap-2">
+            <Button className="gap-2 whitespace-nowrap">
               <Plus className="h-4 w-4" />
               Yangi hodim
             </Button>
