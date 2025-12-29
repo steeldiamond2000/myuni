@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Home, Users, Package, LogOut, Menu, History } from "lucide-react"
+import { Home, Users, Package, LogOut, Menu, History, UserCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: Home },
   { href: "/admin/employees", label: "Hodimlar", icon: Users },
   { href: "/admin/assets", label: "Buyumlar", icon: Package },
+  { href: "/admin/responsibilities", label: "Javobgarlar", icon: UserCheck },
   { href: "/admin/assignments", label: "Javobgarlik Tarixi", icon: History },
 ]
 
